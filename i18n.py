@@ -2,7 +2,6 @@ from babel.messages import extract
 
 from trytond.modules import get_module_info
 from trytond.pool import Pool, PoolMeta
-from trytond.tools import cursor_dict
 from trytond.transaction import Transaction
 
 INTERNAL_LANG = 'en'
@@ -44,12 +43,12 @@ class TranslationSet(metaclass=PoolMeta):
             if 'xgettext' not in dependencies:
                 continue
             cursor.execute(*translation.select(
-                    translation.id, translation.name, translation.src,
+                    translation.src,
                     where=(translation.lang == INTERNAL_LANG)
                     & (translation.name == KEY)
                     & (translation.type == TYPE)
                     & (translation.module == module.name)))
-            existing = {x['src']: x for x in cursor_dict(cursor)}
+            existing = {x[0] for x in cursor.fetchall()}
 
             method_map = [
                 ('**.py', extract.extract_python),
